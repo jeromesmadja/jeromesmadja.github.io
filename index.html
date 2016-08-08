@@ -1,0 +1,135 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on https://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen">
+  <link rel="stylesheet" href="stylesheets/github-dark.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
+
+  <title>Initmapjs</title>
+  <meta name="description" content="">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Initmapjs</h1>
+    </header>
+    <div id="container">
+      <p class="tagline"></p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/jeromesmadja" class="code">View Initmapjs on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h3>
+<a id="about-initmapjs" class="anchor" href="#about-initmapjs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>About INITMAPjs</h3>
+
+<p>Open detection technique When you send an email to someone, normally you have no idea whether he/she receive it or not. When he/she receive it, you have no control what he/she is going to do with it. Just like you are sending a regular mail. You give it to postman; That is all.</p>
+
+<p>However, many email marketer found it very useful if we can know who open our email and at what time. There is an official way of knowing who open your email. It is to ask receivers to send a read receipt. This is done by adding an extra header field to email message. Many email clients support this function. However, not so many people would like to send a receipt back and it is annoying people a little bit to ask them for a receipt.</p>
+
+<p>So what marketers want is a way to track opening without receivers noticing it. In technique, this is possible because many email messages are sent in the format of HTML.</p>
+
+<p>In the HTML source code of email message, we can add additional 1px white image at the end of source code. When email clients such as Ms Outlook receive that message, email clients will do a request to the server for that image file. On the server side, we can then add code to log the request.</p>
+
+<p>For example, we can add below code to the end of an email message. An image file must start with tag with a src attribute. However the file name of that image does not have to be an image like file name such as .gif or .jpg. It can be of anything. On img.aspx page we can add code to log IP and value on query string. After logging, server can response with an image file to email clients.</p>
+
+<p>In this way, we have our open detection function.</p>
+
+<p>Open detection is not very reliable because it only works with HTML email message and some people block image loading on their email client.</p>
+
+<p>How to handle bounced email If you send email and it fails to arrive at its intended recipient for any reason (incorrect user name, network failure, etc.), the message "bounces" and returns to you. That is what we call “bounced email”</p>
+
+<p>According to RFC, bounced email is returned to the email address in SMTP MAIL FROM command. Bounce address is different from the “FROM” address you see on your email message. They can be the same but they are two different things. The “FROM” name and address you see on your email message is added using SMTP DATA command, while bounce address comes from MAIL FROM command. SMTP server keeps a record of bounce address just in case that the email message is undeliverable, SMTP server can return that message to the bounce address. Bounce address does not appear any where in your email message. Some SMTP servers will add it as Return-path to the header of an email message, some servers will not do anything with it. According to RFC, SMTP server can take bounce address out after an email message reaches its destination.</p>
+
+<p>When we send out a campaign to a big list, there will be many emails bounced. If we make bounce address same as FROM address, our people will get 100s or 1000s of bounced email in their inbox. This will not be a nice situation. So we have to use a different email address for bounced email.</p>
+
+<p>How to handle bounced email?</p>
+
+<p>Normal way We can use a different email address for bounced email. All bounced email will returned to that email address, so we can use a pop client to check that email account and process those bounced email.</p>
+
+<p>Below is an example of bounced email. We can analyze the email text, find the email address which is undeliverable and mark it in the database.</p>
+
+<p>Your message did not reach some or all of the intended recipients. Subject: will you come back? Sent: 01/17/2005 16:42 The following recipient(s) could not be reached:</p>
+
+<p>'<a href="mailto:aabcde@planet.nl">aabcde@planet.nl</a>' on 01/17/2005 16:42 550 5.1.1 unknown or illegal alias: <a href="mailto:aabcde@planet.nl">aabcde@planet.nl</a></p>
+
+<p>This sounds like a good solution. However SMTP server will decide itself the content of bounced email. That means in above example, the email address "<a href="mailto:aabcde@planet.nl">aabcde@planet.nl</a>" can appear anywhere within the email message or even not in that message at all. This makes it not 100% reliable in handling bounced email.</p>
+
+<p>Our special solution</p>
+
+<p>We found out that by using a catch all account, the handling of bouced email become very simple.</p>
+
+<p>In our application, in order to process bounced email automatically, you need to have a catch all email account.</p>
+
+<p>Catch all account is a special email account which direct emails that sent to <a href="mailto:NotAvailableUser@yoursite.com">NotAvailableUser@yoursite.com</a> to the email address of your choice. If you do not have extra catch all account available, you can simply ask your domain registrar to create a sub domain with a MX record for you, so you can use a catch all account such as <a href="mailto:xxxx@sub-domain.yoursite.com">xxxx@sub-domain.yoursite.com</a></p>
+
+<p>We specify bounce address as news+{id}@yoursite.com. {id} contains id to identify that email address as well the list it belongs to. An example of bounce address is: <a href="mailto:news-g19e-14444332@umailcampaign.com">news-g19e-14444332@umailcampaign.com</a></p>
+
+<p>Our application will check that catch all account every 10 mins for any new message. If found, it will mark that email address in the database.</p>
+
+<p>We do not mark every email address that was returned. We mark an email address as return by using below rules.</p>
+
+<p>When an email address was returned, it will not be marked as “Return” immediately in the database. Application will start a counter to count how many time this special email address was returned. Only after an email address has been returned more than the "soft return times" defined in SETTING/global, it will be marked as return. Within the same day, for an email address, no matter how many times it was returned, it will only be counted as one time. If an email address does not return for half a year, the counter will restart. For example, if an email address was returned 2 times on 2003, after that everything goes ok. On Jan.2005, that email address was returned again, it will only be counted as 1 times instead of 1+2=3 times.</p>
+
+<p>SMTP Server explained SMTP stands for Simple Mail Transfer Protocol, it is a protocol used to send e-mail on the Internet. SMTP is a set of rules regarding the interaction between a program sending e-mail and a program receiving e-mail. For detail information about SMTP, please refer to RFC 821 Simple Mail Transfer Protocol.</p>
+
+<p>SMTP is Internet’s standard host-to-host mail transport protocol and traditionally operates over TCP on port 25. So for Windows 2000 or up user, you can do the following to send out an email message without any email clients such as Ms Outlook</p>
+
+<p>• Click “start” --&gt; “Run“, type “CMD” • Type “telnet“ then “enter”. Now you will be in the environment of Microsoft telnet client in which you can use commands to send out email message. • Type “open 127.0.0.1 25”, 25 means port 25. Now you are connected with your local SMTP server if you enable SMTP in your IIS.</p>
+
+<p>Below SMTP example shows mail sent by Smith at host test.com to Jones and Brown at host beta.nl. S: means you, R: means response from server.</p>
+
+<p>S: HELO yourdomain R: 250 OK</p>
+
+<p>S: MAIL FROM:<a href="mailto:smith@test.com">smith@test.com</a> R: 250 OK</p>
+
+<p>S: RCPT TO:<a href="mailto:Jones@beta.nl">Jones@beta.nl</a> R: 250 OK</p>
+
+<p>S: RCPT TO:<a href="mailto:Brown@beta.nl">Brown@beta.nl</a> R: 250 OK</p>
+
+<p>S: DATA R: 354 Start mail input; end with . S: Blah blah blah... S: ...etc. etc. etc. S: . R: 250 OK</p>
+
+<p>Why you need a SMTP server</p>
+
+<p>SMTP server is a mail server that supports the SMTP protocol for email transfer. SMTP server is the server that distributes email messages on Internet. Before your email message reaches its destination, it normally will pass several SMTP servers on internet. Those SMTP servers have the responsibility to make sure that your email message will be delivered to the right destination.</p>
+
+<p>Our application will prepare your email message in the format that complies with RFC 2822 Internet Message Format and send it the SMTP server you specify in SETTING\global.</p>
+
+<p>You need to specify a SMTP server which our application can communicate to for mail distribution.</p>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+
+      <p><a href="https://github.com/jeromesmadja" class="avatar"><img src="https://avatars2.githubusercontent.com/u/17283922?v=3&amp;s=60" width="48" height="48"></a>View <a href="https://github.com/jeromesmadja">jeromesmadja</a> on <a href="https://www.github.com">GitHub</a></p>
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/jeromesmadja/jeromesmadja.github.io/tarball/master" class="tar">tar</a><a href="https://github.com/jeromesmadja/jeromesmadja.github.io/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
+</html>
